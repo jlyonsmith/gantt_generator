@@ -1,0 +1,22 @@
+name: gantt_generator
+description: A simple command-line application.
+version: 0.0.0
+# homepage: https://www.example.com
+
+executables:
+  gantt_generator:
+
+environment:
+  sdk: ">=2.16.1"
+
+dependencies:
+  args: ^2.3.0
+  dart_date: ^1.1.1
+  intl: ^0.17.0
+  json5: ^0.7.0
+  mustache_template: ^2.0.0
+  path: ^1.8.0
+  resource_portable: ^3.0.0
+
+dev_dependencies:
+  lints: ^1.0.0
