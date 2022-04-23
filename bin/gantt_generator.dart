@@ -39,12 +39,14 @@ ${argParser.usage}
   final outputFilename = argResults['output'];
   final htmlTemplate =
       Template(htmlSource, name: outputFilename, lenient: true);
-  final classes = [];
+  final taskClasses = [];
+  final milestoneClasses = [];
   final rows = [];
   final resourceColors = [
     '007FBE',
     '00B570',
     'FF9600',
+    '000000',
   ];
   var startDate = DateFormat.yMd('en_US').parse(project['startDate']);
 
@@ -56,78 +58,98 @@ ${argParser.usage}
   }
 
   final tasks = project['tasks'] as List<dynamic>;
-  var taskIndex = 1;
+  var id = 1;
 
   for (var task in tasks) {
-    var taskClass = {};
+    var rowClass = {};
     var taskRow = {};
-    final className = "task-$taskIndex";
     final months = List.filled(12, {});
 
-    months[startDate.month - 1] = {
-      'itemStart': {'className': className}
-    };
-    taskRow['title'] = task['title'];
     taskRow['months'] = months;
+    taskRow['title'] = task['title'];
 
-    if (taskIndex == tasks.length) {
+    if (id == tasks.length) {
       taskRow['lastRow'] = true;
     }
 
-    // Work out the offset % in the start month
-    taskClass['name'] = className;
-    taskClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth;
-    taskClass['color'] =
+    rowClass['color'] =
         resourceColors[(task['resource'] as double).toInt() - 1];
 
-    // Calculate the duration % from start
-    var date = startDate;
-    var duration = (task['duration'] as double).toInt();
-    // Move forward a day a time until the duration is reached
-    while (duration > 0) {
-      if (date.getWeekday >= 6) {
-        // Skip weekends
+    // Work out the offset % in the start month
+    rowClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth;
+
+    if (task['duration'] == null) {
+      final className = "milestone-$id";
+
+      // This is a milestone
+      months[startDate.month - 1] = {
+        'milestone': {'className': className},
+      };
+
+      rowClass['name'] = className;
+
+      milestoneClasses.add(rowClass);
+    } else {
+      final className = "task-$id";
+
+      rowClass['name'] = className;
+
+      // This is a task
+      months[startDate.month - 1] = {
+        'bar': {'className': className}
+      };
+
+      // Calculate the duration % from start
+      var date = startDate;
+      var duration = (task['duration'] as double).toInt();
+      // Move forward a day a time until the duration is reached
+      while (duration > 0) {
+        if (date.getWeekday >= 6) {
+          // Skip weekends
+          date += Duration(days: 1);
+          continue;
+        }
+
+        duration--;
         date += Duration(days: 1);
-        continue;
       }
 
-      duration--;
-      date += Duration(days: 1);
+      double durationPercent;
+
+      if (date.month == startDate.month) {
+        // If still in same month, duration is percent of days in month
+        durationPercent =
+            Interval(startDate, date).duration.inDays / date.getDaysInMonth;
+      } else {
+        // Add remainder of first month
+        durationPercent = (startDate.getDaysInMonth - startDate.day + 1) /
+            startDate.getDaysInMonth;
+
+        // Add offset of day in last month
+        durationPercent += (date.day - 1) / date.getDaysInMonth;
+
+        // Add 100% for other months
+        durationPercent += date.month - startDate.month - 1;
+      }
+
+      startDate = date;
+
+      // Ensure minimum percentage duration
+      rowClass['duration'] = max(durationPercent, 0.1);
+
+      taskClasses.add(rowClass);
     }
 
-    double durationPercent;
-
-    if (date.month == startDate.month) {
-      // If still in same month, duration is percent of days in month
-      durationPercent =
-          Interval(startDate, date).duration.inDays / date.getDaysInMonth;
-    } else {
-      // Add remainder of first month
-      durationPercent = (startDate.getDaysInMonth - startDate.day + 1) /
-          startDate.getDaysInMonth;
-
-      // Add offset of day in last month
-      durationPercent += (date.day - 1) / date.getDaysInMonth;
-
-      // Add 100% for other months
-      durationPercent += date.month - startDate.month - 1;
-    }
-
-    startDate = date;
-
-    // Ensure minimum percentage duration
-    taskClass['duration'] = max(durationPercent, 0.1);
-
-    classes.add(taskClass);
     rows.add(taskRow);
 
-    taskIndex++;
+    id++;
   }
 
   final data = {
     'title': project['title'],
     'cellWidth': 70,
-    'classes': classes,
+    'milestoneClasses': milestoneClasses,
+    'taskClasses': taskClasses,
     'rows': rows,
   };
   //stdout.writeln(data);

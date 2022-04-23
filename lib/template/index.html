@@ -30,6 +30,9 @@
     }
 
     .item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       padding-top: 5px;
       padding-bottom: 5px;
       border-bottom: 2px solid #ddd;
@@ -52,13 +55,29 @@
       border-radius: 3px;
     }
 
-    {{#classes}}
+    .milestone {
+      display: flex;
+      position: relative;
+      height: 16px;
+      width: 16px;
+      text-align: center;
+      transform:rotate(45deg);
+    }
+
+    {{#milestoneClasses}}
+    .{{name}} {
+      left: calc({{cellWidth}}px * {{start}} - 8px);
+      background-color: #{{color}};
+    }
+    {{/milestoneClasses}}
+
+    {{#taskClasses}}
     .{{name}} {
       left: calc({{cellWidth}}px * {{start}});
       width: calc({{cellWidth}}px * {{duration}});
       background-color: #{{color}};
     }
-    {{/classes}}
+    {{/taskClasses}}
   </style>
 </head>
 <body>
@@ -82,7 +101,7 @@
     <!-- {{title}} -->
     <div class="item first-item{{#lastRow}} last-row{{/lastRow}}">{{title}}</div>
     {{#months}}
-    <div class="item{{#lastRow}} last-row{{/lastRow}}">{{#itemStart}}<span class="bar {{className}}"/>{{/itemStart}}</div>
+    <div class="item{{#lastRow}} last-row{{/lastRow}}">{{#milestone}}<span class="milestone {{className}}">&nbsp;</span>{{/milestone}}{{#bar}}<span class="bar {{className}}"/>{{/bar}}</div>
     {{/months}}
     {{/rows}}
   </div>
