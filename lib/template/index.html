@@ -12,7 +12,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 3fr repeat(12, 1fr);
+      grid-template-columns: calc({{cellWidth}}px * 3) repeat(12, {{cellWidth}}px);
       grid-gap: 0px;
       background-color: #fff;
       color: #444;
@@ -49,13 +49,13 @@
       display: flex;
       position: relative;
       height: 22px;
-      border-radius: 11px;
+      border-radius: 3px;
     }
 
     {{#classes}}
     .{{name}} {
-      left: {{start}}%;
-      width: {{duration}}%;
+      left: calc({{cellWidth}}px * {{start}});
+      width: calc({{cellWidth}}px * {{duration}});
       background-color: #{{color}};
     }
     {{/classes}}

@@ -64,8 +64,6 @@ ${argParser.usage}
     final className = "task-$taskIndex";
     final months = List.filled(12, {});
 
-    stdout.writeln("$startDate");
-
     months[startDate.month - 1] = {
       'itemStart': {'className': className}
     };
@@ -78,7 +76,7 @@ ${argParser.usage}
 
     // Work out the offset % in the start month
     taskClass['name'] = className;
-    taskClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth * 100;
+    taskClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth;
     taskClass['color'] =
         resourceColors[(task['resource'] as double).toInt() - 1];
 
@@ -102,25 +100,23 @@ ${argParser.usage}
     if (date.month == startDate.month) {
       // If still in same month, duration is percent of days in month
       durationPercent =
-          Interval(startDate, date).duration.inDays / date.getDaysInMonth * 100;
-      // stdout.writeln("$durationPercent");
+          Interval(startDate, date).duration.inDays / date.getDaysInMonth;
     } else {
       // Add remainder of first month
       durationPercent = (startDate.getDaysInMonth - startDate.day + 1) /
-          startDate.getDaysInMonth *
-          100;
+          startDate.getDaysInMonth;
 
       // Add offset of day in last month
-      durationPercent += (date.day - 1) / date.getDaysInMonth * 100;
+      durationPercent += (date.day - 1) / date.getDaysInMonth;
 
       // Add 100% for other months
-      durationPercent += 100 * (date.month - startDate.month - 1);
+      durationPercent += date.month - startDate.month - 1;
     }
 
     startDate = date;
 
     // Ensure minimum percentage duration
-    taskClass['duration'] = max(durationPercent, 10.0);
+    taskClass['duration'] = max(durationPercent, 0.1);
 
     classes.add(taskClass);
     rows.add(taskRow);
@@ -130,6 +126,7 @@ ${argParser.usage}
 
   final data = {
     'title': project['title'],
+    'cellWidth': 70,
     'classes': classes,
     'rows': rows,
   };
