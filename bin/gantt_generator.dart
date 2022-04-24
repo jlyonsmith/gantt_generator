@@ -42,7 +42,7 @@ ${argParser.usage}
   final taskClasses = [];
   final milestoneClasses = [];
   final rows = [];
-  final resourceColors = [
+  final colors = [
     '007FBE',
     '00B570',
     'FF9600',
@@ -57,28 +57,27 @@ ${argParser.usage}
     return;
   }
 
-  final tasks = project['tasks'] as List<dynamic>;
+  final items = project['items'] as List<dynamic>;
   var id = 1;
 
-  for (var task in tasks) {
+  for (var item in items) {
     var rowClass = {};
     var taskRow = {};
     final months = List.filled(12, {});
 
     taskRow['months'] = months;
-    taskRow['title'] = task['title'];
+    taskRow['title'] = item['title'];
 
-    if (id == tasks.length) {
+    if (id == items.length) {
       taskRow['lastRow'] = true;
     }
 
-    rowClass['color'] =
-        resourceColors[(task['resource'] as double).toInt() - 1];
+    rowClass['color'] = colors[(item['color'] as double).toInt() - 1];
 
     // Work out the offset % in the start month
     rowClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth;
 
-    if (task['duration'] == null) {
+    if (item['duration'] == null) {
       final className = "milestone-$id";
 
       // This is a milestone
@@ -101,7 +100,7 @@ ${argParser.usage}
 
       // Calculate the duration % from start
       var date = startDate;
-      var duration = (task['duration'] as double).toInt();
+      var duration = (item['duration'] as double).toInt();
       // Move forward a day a time until the duration is reached
       while (duration > 0) {
         if (date.getWeekday >= 6) {
