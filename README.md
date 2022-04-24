@@ -7,6 +7,7 @@ This is a simple Gantt chart generator written as [Dart](https://dart.dev/) comm
 1. [Install Dart](https://dart.dev/get-dart).  I recommend installing it via [Flutter](https://docs.flutter.dev/get-started/install).
 2. Create a sample JSON/JSON5 file (see below)
 3. Build and run the tool with `dart pub global run gantt_generator -i scratch/project.json5 -o scratch/index.html`
+4. Run a tool like [live-reload](https://www.npmjs.com/package/live-server) to view the `index.html` output in real time
 
 ## Interesting Details
 
@@ -62,3 +63,7 @@ Here's a sample project file to show the format that the tool expects:
   ],
 }
 ```
+
+And here's the output:
+
+![Sample Gantt Chart](./example.png)
