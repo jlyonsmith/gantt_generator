@@ -42,12 +42,7 @@ ${argParser.usage}
   final taskClasses = [];
   final milestoneClasses = [];
   final rows = [];
-  final colors = [
-    '007FBE',
-    '00B570',
-    'FF9600',
-    '000000',
-  ];
+  final colors = project['colors'] as List<dynamic>;
   final items = project['items'] as List<dynamic>;
 
   // Check the first task has a startDate and a color
@@ -86,7 +81,7 @@ ${argParser.usage}
     }
 
     if (item['color'] != null) {
-      color = colors[(item['color'] as int) - 1];
+      color = colors[item['color'] as int];
     }
 
     rowClass['color'] = color;
