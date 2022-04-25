@@ -48,34 +48,49 @@ ${argParser.usage}
     'FF9600',
     '000000',
   ];
-  var startDate = DateFormat.yMd('en_US').parse(project['startDate']);
+  final items = project['items'] as List<dynamic>;
 
-  if (startDate.getWeekday >= 6) {
-    stderr.writeln(
-        "Start date ${DateFormat.yMd().format(startDate)} is not a weekday");
+  // Check the first task has a startDate and a color
+  if (items[0]['color'] == null || items[0]['startDate'] == null) {
+    stderr.writeln("First task must have a color and a startDate");
     exitCode = -1;
     return;
   }
 
-  final items = project['items'] as List<dynamic>;
+  DateTime? startDate;
+  String? color;
   var id = 1;
 
   for (var item in items) {
     var rowClass = {};
     var taskRow = {};
     final months = List.filled(12, {});
+    final title = item['title'];
 
     taskRow['months'] = months;
-    taskRow['title'] = item['title'];
+    taskRow['title'] = title;
 
     if (id == items.length) {
       taskRow['lastRow'] = true;
     }
 
-    rowClass['color'] = colors[(item['color'] as double).toInt() - 1];
+    if (item['startDate'] != null) {
+      startDate = DateFormat.yMd('en_US').parse(item['startDate']);
 
-    // Work out the offset % in the start month
-    rowClass['start'] = (startDate.day - 1) / startDate.getDaysInMonth;
+      if (startDate.getWeekday >= 6) {
+        stderr.writeln(
+            "Item '$title' start date ${DateFormat.yMd().format(startDate)} is not a weekday");
+        exitCode = -1;
+        return;
+      }
+    }
+
+    if (item['color'] != null) {
+      color = colors[(item['color'] as int) - 1];
+    }
+
+    rowClass['color'] = color;
+    rowClass['start'] = (startDate!.day - 1) / startDate.getDaysInMonth;
 
     if (item['duration'] == null) {
       final className = "milestone-$id";
@@ -100,7 +115,7 @@ ${argParser.usage}
 
       // Calculate the duration % from start
       var date = startDate;
-      var duration = (item['duration'] as double).toInt();
+      var duration = item['duration'] as int;
       // Move forward a day a time until the duration is reached
       while (duration > 0) {
         if (date.getWeekday >= 6) {

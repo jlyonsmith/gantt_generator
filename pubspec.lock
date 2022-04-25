@@ -42,7 +42,7 @@ packages:
       name: json5
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.0"
+    version: "0.8.0"
   lints:
     dependency: "direct dev"
     description:
